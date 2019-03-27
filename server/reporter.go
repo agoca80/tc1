@@ -17,7 +17,7 @@ import (
 //   and from the report String() method, so, there is no strong consistency
 //   Eventually consistency will be provided by stopping the filter
 func (s *service) reporter() {
-	clock := time.NewTicker(1 * time.Second)
+	clock := time.NewTicker(10 * time.Second)
 	for {
 		select {
 
