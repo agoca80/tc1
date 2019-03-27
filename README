@@ -1,0 +1,47 @@
+--------------------------------------------------------------------------
+
+RUNNING THE SERVER
+
+To run the server, you must specify the mode. There are two options:
+- server
+- client
+
+The client option is just for testing purposes
+
+To run the server, you needd to execute the command below:
+
+go run main.go server
+
+--------------------------------------------------------------------------
+
+TESTING THE SERVER
+
+There are two easy ways of testing the server:
+
+- If you want to check the server input and output, just run the script test.sh
+
+bash tests.sh
+
+This script will launch a sintetic client and a server. The client will send the termination
+signal after 10 seconds. Due to the pipeline process delay, the server may run a little longer
+Once the server has finished, it will compare the input and number.log for discrepancies in the
+uniques numbers seen in both files
+
+- Using the go test -run=Server
+
+This mode is useful to test the server with a custom client
+This may be used also to get profiling information:
+
+go test -cpuprofile profile.cpu -run=Server
+go test -blockprofile profile.block -run=Server
+go test -memprofile profile.mem -run=Server
+
+--------------------------------------------------------------------------
+
+PROFILING
+
+Run the ./profile.sh script to get the profiling of the server
+
+
+--------------------------------------------------------------------------
+
