@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/agoca80/tc1/client"
@@ -22,13 +21,9 @@ func Client() { client.Start() }
 // The main function only has 2 inputs:
 // - The first argument
 func main() {
-	switch os.Args[1] {
-	case "server":
+	if len(os.Args) < 2 || os.Args[1] == "server" {
 		Server()
-	case "client":
+	} else {
 		Client()
-	default:
-		fmt.Println("Read the README file for instructions")
-		fmt.Println()
 	}
 }
