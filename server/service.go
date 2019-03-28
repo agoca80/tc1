@@ -121,7 +121,7 @@ func Start() {
 
 	// Last step in the pipeline
 	for unique := range (<-chan int)(s.uniques) {
-		fmt.Fprint(s, fmt.Sprintf("%09d\n", unique))
+		fmt.Fprintln(s, unique)
 	}
 
 }

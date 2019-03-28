@@ -1,16 +1,13 @@
 package server
 
-import (
-	"fmt"
-	"io"
-)
+import "fmt"
 
 // filter processes the numbers from the workers
 func (s *service) filter(numbers <-chan int, uniques chan<- int) {
 	for number := range numbers {
 		// Only for testing purposes
 		if Testing {
-			io.WriteString(s.input, fmt.Sprintf("%09d\n", number))
+			fmt.Fprintln(s.input, number)
 		}
 		if s.Remembers(number) {
 			s.Duplicates++
