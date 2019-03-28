@@ -27,6 +27,7 @@ func (s *service) reporter() {
 
 		case <-clock.C:
 			fmt.Println(s)
+			s.Uniques, s.Duplicates = 0, 0
 
 		}
 	}
