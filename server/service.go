@@ -58,7 +58,7 @@ type service struct {
 
 	// Numbers the service has already seen.
 	// All access are serialized through the pipeline
-	*Memory
+	Memory
 
 	// pool of workers
 	// This keeps track of the workers which have finished.
@@ -68,7 +68,7 @@ type service struct {
 }
 
 func newService() *service {
-	writer, err := os.OpenFile("numbers.log", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	writer, err := os.OpenFile("numbers.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -86,7 +86,6 @@ func newService() *service {
 	return &service{
 		conns:     make(chan net.Conn),
 		Listener:  listener,
-		Memory:    newMemory(),
 		numbers:   make(chan int, 5*1024),
 		terminate: make(chan bool),
 		uniques:   make(chan int),
@@ -99,6 +98,8 @@ func newService() *service {
 // Start ...
 func Start() {
 	s := newService()
+
+	s.remind()
 
 	go s.reporter()
 
@@ -124,6 +125,7 @@ func Start() {
 		fmt.Fprintln(s, unique)
 	}
 
+	s.store()
 }
 
 // terminating poll the terminate broadcast channel

@@ -9,7 +9,7 @@ func (s *service) filter(numbers <-chan int, uniques chan<- int) {
 		if Testing {
 			fmt.Fprintln(s.input, number)
 		}
-		if s.Remembers(number) {
+		if s.remembers(number) {
 			s.Duplicates++
 		} else {
 			s.Uniques++
