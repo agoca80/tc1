@@ -31,7 +31,7 @@ func (s *service) serialize(conn io.ReadCloser, numbers chan<- int) {
 	for !s.terminating() {
 		number, err := newNumber(reader)
 		switch {
-		case err != nil:
+		case err != nil || number == invalid:
 			// error while reading from the connection
 			// close the connection and go back to process another one
 			conn.Close()
@@ -42,7 +42,7 @@ func (s *service) serialize(conn io.ReadCloser, numbers chan<- int) {
 			close(s.terminate)
 			s.Close()
 
-		case number != invalid:
+		default:
 			// The number is valid, send it to the filter
 			numbers <- number
 		}
