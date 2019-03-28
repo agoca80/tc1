@@ -12,10 +12,9 @@ func (s *service) filter(numbers <-chan int, uniques chan<- int) {
 		if Testing {
 			io.WriteString(s.input, fmt.Sprintf("%09d\n", number))
 		}
-		if s.Remembers[number] {
+		if s.Remembers(number) {
 			s.Duplicates++
 		} else {
-			s.Remembers[number] = true
 			s.Uniques++
 			s.Total++
 			uniques <- number

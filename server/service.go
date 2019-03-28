@@ -86,7 +86,7 @@ func newService() *service {
 	return &service{
 		conns:     make(chan net.Conn),
 		Listener:  listener,
-		Memory:    new(Memory),
+		Memory:    newMemory(),
 		numbers:   make(chan int, 5*1024),
 		terminate: make(chan bool),
 		uniques:   make(chan int),
