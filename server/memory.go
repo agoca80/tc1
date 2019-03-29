@@ -7,7 +7,7 @@ package server
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/json"
+	"encoding/binary"
 	"fmt"
 	"io/ioutil"
 	"math/bits"
@@ -30,28 +30,25 @@ func (m Memory) remembers(n int) (ok bool) {
 
 const dump = "dump.gz"
 
-func (m Memory) store() {
-	j, err := json.Marshal(m)
+func (s *service) store() {
+	buffer := new(bytes.Buffer)
+	err := binary.Write(buffer, binary.BigEndian, &s.Memory)
 	if err != nil {
 		panic(err)
 	}
 
-	var buf bytes.Buffer
-	gz := gzip.NewWriter(&buf)
-	_, err = gz.Write(j)
+	file, err := os.OpenFile(dump, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
 
-	err = gz.Close()
+	gz := gzip.NewWriter(file)
+	_, err = gz.Write(buffer.Bytes())
 	if err != nil {
 		panic(err)
 	}
-
-	err = ioutil.WriteFile(dump, buf.Bytes(), 0644)
-	if err != nil {
-		panic(err)
-	}
+	gz.Close()
+	file.Close()
 }
 
 func (s *service) remind() {
@@ -69,18 +66,12 @@ func (s *service) remind() {
 		panic(err)
 	}
 
-	buf := bytes.NewBuffer(load)
-	gz, err := gzip.NewReader(buf)
+	gz, err := gzip.NewReader(bytes.NewBuffer(load))
 	if err != nil {
 		panic(err)
 	}
 
-	inner, err := ioutil.ReadAll(gz)
-	if err != nil {
-		panic(err)
-	}
-
-	err = json.Unmarshal(inner, &s.Memory)
+	err = binary.Read(gz, binary.BigEndian, &s.Memory)
 	if err != nil {
 		panic(err)
 	}
