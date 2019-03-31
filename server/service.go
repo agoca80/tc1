@@ -40,12 +40,9 @@ type service struct {
 	//
 	net.Listener
 	// The listener will be closed when the broadcast signal arrives
-	// conns will be dispatched from the dispatcher to the workers
-	// as long as the termination signal has not been broadcasted.
-	conns chan net.Conn //
 	// workers will process connections while they are valid and
 	// the termination signal has not been broadcasted.
-	// conns will be serialized to numbers and sent to the filter
+	// conns will be serialized to numbers and sent to numbers
 	numbers chan int
 	input   io.Writer
 	// numbers are provided by the workers to the filter.
@@ -84,7 +81,6 @@ func newService() *service {
 	}
 
 	return &service{
-		conns:     make(chan net.Conn),
 		Listener:  listener,
 		numbers:   make(chan int, 5*1024),
 		terminate: make(chan bool),
