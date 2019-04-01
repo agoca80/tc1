@@ -44,11 +44,9 @@ type service struct {
 	// the termination signal has not been broadcasted.
 	// conns will be serialized to numbers and sent to numbers
 	numbers chan int
-	input   io.Writer
 	// numbers are provided by the workers to the filter.
 	// If the number was seen for the first time,
 	// it will be send back to the service through uniques,
-	// and optionally to input if Testing is true
 	uniques chan int
 	// The service will read numbers from here and write them to io.Writer
 	io.Writer
@@ -70,11 +68,6 @@ func newService() *service {
 		panic(err)
 	}
 
-	input, err := os.OpenFile("input", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		panic(err)
-	}
-
 	listener, err := net.Listen("tcp", ":4000")
 	if err != nil {
 		panic(err)
@@ -87,7 +80,6 @@ func newService() *service {
 		uniques:   make(chan int),
 
 		Writer: writer,
-		input:  input,
 	}
 }
 
