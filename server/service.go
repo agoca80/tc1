@@ -70,7 +70,7 @@ func newService() *service {
 		panic(err)
 	}
 
-	input, err := os.OpenFile("input", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	input, err := os.OpenFile("input", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		panic(err)
 	}
