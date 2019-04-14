@@ -5,7 +5,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"sync"
 )
 
 // Testing ...
@@ -16,16 +15,16 @@ type service struct {
 	Duplicates int
 	Uniques    int
 	Total      int
-	input      io.Writer
 
 	net.Listener
-	io.Writer
+	input  io.Writer
+	output io.Writer
+
 	Memory
-	sync.WaitGroup
 }
 
 func newService() *service {
-	writer, err := os.OpenFile("numbers.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	output, err := os.OpenFile("numbers.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -43,8 +42,8 @@ func newService() *service {
 	return &service{
 		Listener:  listener,
 		terminate: make(chan bool),
-		Writer:    writer,
 		input:     input,
+		output:    output,
 	}
 }
 
@@ -59,7 +58,7 @@ func Start() {
 		uniques = make(chan int)
 	)
 
-	NewWorker(func() { s.reporter() })
+	NewWorker(func() { s.reporter(Report) })
 	NewWorker(func() { s.dispatcher(clients) })
 	NewWorker(NewPool(
 		Clients,

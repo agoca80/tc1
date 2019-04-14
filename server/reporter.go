@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-func (s *service) reporter() {
-	clock := time.NewTicker(10 * time.Second)
+func (s *service) reporter(period time.Duration) {
+	clock := time.NewTicker(period)
+	defer clock.Stop()
 	for {
 		select {
 
 		case <-s.terminate:
-			clock.Stop()
 			return
 
 		case <-clock.C:
