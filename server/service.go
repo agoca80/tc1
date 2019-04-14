@@ -74,9 +74,7 @@ func Start() {
 		close(numbers)
 	}()
 
-	for unique := range (<-chan int)(uniques) {
-		fmt.Fprintln(s, unique)
-	}
+	s.record(uniques)
 
 	s.store()
 }
