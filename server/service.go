@@ -51,6 +51,7 @@ func newService() *service {
 // Start ...
 func Start() {
 	s := newService()
+	s.remind()
 
 	var (
 		clients = make(chan io.ReadCloser)
@@ -58,24 +59,16 @@ func Start() {
 		uniques = make(chan int)
 	)
 
-	s.remind()
-
-	go s.reporter()
-	go s.dispatcher(clients)
-	for i := 0; i < 5; i++ {
-		s.Add(1)
-		go s.worker(clients, numbers)
-	}
-
-	go s.filter(numbers, uniques)
-
-	go func() {
-		s.Wait()
-		close(numbers)
-	}()
+	NewWorker(func() { s.reporter() })
+	NewWorker(func() { s.dispatcher(clients) })
+	NewWorker(NewPool(
+		Clients,
+		func() { s.process(clients, numbers) },
+		func() { close(numbers) },
+	))
+	NewWorker(func() { s.filter(numbers, uniques) })
 
 	s.record(uniques)
-
 	s.store()
 }
 
