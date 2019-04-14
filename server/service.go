@@ -56,13 +56,17 @@ func newService() *service {
 func Start() {
 	s := newService()
 
+	var (
+		clients = make(chan io.ReadCloser)
+	)
+
 	s.remind()
 
 	go s.reporter()
-
+	go s.dispatcher(clients)
 	for i := 0; i < 5; i++ {
 		s.Add(1)
-		go s.worker(s.numbers)
+		go s.worker(clients, s.numbers)
 	}
 
 	go s.filter(s.numbers, s.uniques)

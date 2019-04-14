@@ -14,6 +14,7 @@ import (
 	"os"
 )
 
+// Memory ...
 type Memory []uint64
 
 const size = 1000000000

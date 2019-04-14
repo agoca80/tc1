@@ -5,12 +5,9 @@ import (
 	"io"
 )
 
-func (s *service) worker(numbers chan<- int) {
-	for s.Running() {
-		conn, err := s.Accept()
-		if err == nil {
-			s.serialize(conn, numbers)
-		}
+func (s *service) worker(clients <-chan io.ReadCloser, numbers chan<- int) {
+	for client := range clients {
+		s.serialize(client, numbers)
 	}
 
 	s.Done()
