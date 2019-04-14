@@ -28,7 +28,7 @@ func (m Memory) remembers(n int) (ok bool) {
 
 const dump = "dump.gz"
 
-func (s *service) store() {
+func (s *Service) store() {
 	buffer := new(bytes.Buffer)
 	err := binary.Write(buffer, binary.BigEndian, &s.Memory)
 	if err != nil {
@@ -49,7 +49,7 @@ func (s *service) store() {
 	file.Close()
 }
 
-func (s *service) remind() {
+func (s *Service) remind() {
 	s.Memory = make(Memory, size/64+1)
 	_, err := os.Stat(dump)
 	if os.IsNotExist(err) {

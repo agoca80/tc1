@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net"
 	"os"
 
 	"github.com/agoca80/tc1/client"
@@ -9,10 +10,23 @@ import (
 
 // Server ...
 func Server() {
-	if os.Getenv("testing") == "true" {
-		server.Testing = true
+	output, err := os.OpenFile("numbers.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		panic(err)
 	}
-	server.Start()
+
+	input, err := os.OpenFile("input", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	listener, err := net.Listen("tcp", ":4000")
+	if err != nil {
+		panic(err)
+	}
+
+	service := server.New(listener, input, output)
+	service.Start()
 }
 
 // Client ...

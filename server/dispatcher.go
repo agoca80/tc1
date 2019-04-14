@@ -2,7 +2,7 @@ package server
 
 import "io"
 
-func (s *service) dispatcher(clients chan<- io.ReadCloser) {
+func (s *Service) dispatcher(clients chan<- io.ReadCloser) {
 	defer close(clients)
 	for s.Running() {
 		client, err := s.Accept()

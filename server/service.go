@@ -1,20 +1,14 @@
 package server
 
 import (
-	"fmt"
 	"io"
 	"net"
-	"os"
 )
 
-// Testing ...
-var Testing = false
-
-type service struct {
-	terminate  chan bool
-	Duplicates int
-	Uniques    int
-	Total      int
+// Service ...
+type Service struct {
+	terminate chan bool
+	Stats
 
 	net.Listener
 	input  io.Writer
@@ -23,23 +17,10 @@ type service struct {
 	Memory
 }
 
-func newService() *service {
-	output, err := os.OpenFile("numbers.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		panic(err)
-	}
+// New ...
+func New(listener net.Listener, input, output io.Writer) *Service {
 
-	input, err := os.OpenFile("input", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		panic(err)
-	}
-
-	listener, err := net.Listen("tcp", ":4000")
-	if err != nil {
-		panic(err)
-	}
-
-	return &service{
+	return &Service{
 		Listener:  listener,
 		terminate: make(chan bool),
 		input:     input,
@@ -48,8 +29,7 @@ func newService() *service {
 }
 
 // Start ...
-func Start() {
-	s := newService()
+func (s *Service) Start() {
 	s.remind()
 
 	var (
@@ -71,15 +51,11 @@ func Start() {
 	s.store()
 }
 
-func (s *service) Running() bool {
+func (s *Service) Running() bool {
 	select {
 	case <-s.terminate:
 		return false
 	default:
 		return true
 	}
-}
-
-func (s *service) String() string {
-	return fmt.Sprintf("Received %v unique numbers, %v duplicates. Unique total: %v", s.Uniques, s.Duplicates, s.Total)
 }

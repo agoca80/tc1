@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func (s *service) reporter(period time.Duration) {
+func (s *Service) reporter(period time.Duration) {
 	clock := time.NewTicker(period)
 	defer clock.Stop()
 	for {
