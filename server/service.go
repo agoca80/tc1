@@ -8,6 +8,7 @@ import (
 	"sync"
 )
 
+// Testing ...
 var Testing = false
 
 type service struct {
@@ -51,6 +52,7 @@ func newService() *service {
 	}
 }
 
+// Start ...
 func Start() {
 	s := newService()
 
@@ -77,12 +79,12 @@ func Start() {
 	s.store()
 }
 
-func (s *service) terminating() bool {
+func (s *service) Running() bool {
 	select {
 	case <-s.terminate:
-		return true
-	default:
 		return false
+	default:
+		return true
 	}
 }
 

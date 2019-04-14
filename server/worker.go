@@ -6,7 +6,7 @@ import (
 )
 
 func (s *service) worker(numbers chan<- int) {
-	for !s.terminating() {
+	for s.Running() {
 		conn, err := s.Accept()
 		if err == nil {
 			s.serialize(conn, numbers)
@@ -19,7 +19,7 @@ func (s *service) worker(numbers chan<- int) {
 func (s *service) serialize(conn io.ReadCloser, numbers chan<- int) {
 	reader := bufio.NewReader(conn)
 
-	for !s.terminating() {
+	for s.Running() {
 		number, err := newNumber(reader)
 		switch {
 		case err != nil || number == invalid:
