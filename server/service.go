@@ -16,10 +16,9 @@ type service struct {
 	Duplicates int
 	Uniques    int
 	Total      int
+	input      io.Writer
+
 	net.Listener
-	numbers chan int
-	input   io.Writer
-	uniques chan int
 	io.Writer
 	Memory
 	sync.WaitGroup
@@ -43,12 +42,9 @@ func newService() *service {
 
 	return &service{
 		Listener:  listener,
-		numbers:   make(chan int, 5*1024),
 		terminate: make(chan bool),
-		uniques:   make(chan int),
-
-		Writer: writer,
-		input:  input,
+		Writer:    writer,
+		input:     input,
 	}
 }
 
@@ -58,6 +54,8 @@ func Start() {
 
 	var (
 		clients = make(chan io.ReadCloser)
+		numbers = make(chan int, 5*1024)
+		uniques = make(chan int)
 	)
 
 	s.remind()
@@ -66,17 +64,17 @@ func Start() {
 	go s.dispatcher(clients)
 	for i := 0; i < 5; i++ {
 		s.Add(1)
-		go s.worker(clients, s.numbers)
+		go s.worker(clients, numbers)
 	}
 
-	go s.filter(s.numbers, s.uniques)
+	go s.filter(numbers, uniques)
 
 	go func() {
 		s.Wait()
-		close(s.numbers)
+		close(numbers)
 	}()
 
-	for unique := range (<-chan int)(s.uniques) {
+	for unique := range (<-chan int)(uniques) {
 		fmt.Fprintln(s, unique)
 	}
 
