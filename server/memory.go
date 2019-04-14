@@ -14,13 +14,10 @@ import (
 	"os"
 )
 
-// Memory ...
 type Memory []uint64
 
 const size = 1000000000
 
-// no slice boundaries performed.
-// let it panic if they are exceeded
 func (m Memory) remembers(n int) (ok bool) {
 	w, b := n/64, uint(n%64)
 	ok = m[w]&(1<<b) != 0

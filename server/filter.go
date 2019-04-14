@@ -2,10 +2,8 @@ package server
 
 import "fmt"
 
-// filter processes the numbers from the workers
 func (s *service) filter(numbers <-chan int, uniques chan<- int) {
 	for number := range numbers {
-		// Only for testing purposes
 		if Testing {
 			fmt.Fprintln(s.input, number)
 		}
@@ -19,6 +17,5 @@ func (s *service) filter(numbers <-chan int, uniques chan<- int) {
 	}
 	close(uniques)
 
-	// Print last report
 	fmt.Println(s)
 }

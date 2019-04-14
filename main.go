@@ -7,7 +7,7 @@ import (
 	"github.com/agoca80/tc1/server"
 )
 
-// Server wrapper
+// Server ...
 func Server() {
 	if os.Getenv("testing") == "true" {
 		server.Testing = true
@@ -15,11 +15,9 @@ func Server() {
 	server.Start()
 }
 
-// Client wrapper
+// Client ...
 func Client() { client.Start() }
 
-// The main function only has 2 inputs:
-// - The first argument
 func main() {
 	if len(os.Args) < 2 || os.Args[1] == "server" {
 		Server()
