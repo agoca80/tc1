@@ -62,6 +62,7 @@ func Start() {
 				return
 			default:
 				Send(conn, generator.Number())
+				time.Sleep(time.Microsecond)
 			}
 		}
 	}
@@ -71,7 +72,7 @@ func Start() {
 		go minion()
 	}
 
-	time.Sleep(time.Duration(10) * time.Second)
+	time.Sleep(time.Second)
 	close(die)
 	Terminate()
 }

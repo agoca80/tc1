@@ -15,3 +15,4 @@ else
     echo FAIL
 fi
 
+rm input numbers.log dump.gz
