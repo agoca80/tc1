@@ -1,32 +1,33 @@
 package server
 
 import (
-	"bufio"
 	"io"
+
+	"github.com/agoca80/tc1/parser"
 )
 
 func (s *service) process(clients <-chan io.ReadCloser, numbers chan<- int) {
 	for client := range clients {
 		s.serialize(client, numbers)
+		client.Close()
 	}
 }
 
-func (s *service) serialize(conn io.ReadCloser, numbers chan<- int) {
-	reader := bufio.NewReader(conn)
+func (s *service) serialize(client io.Reader, numbers chan<- int) {
+	p := parser.New(client)
 
 	for s.Running() {
-		number, err := newNumber(reader)
-		switch {
-		case err != nil || number == invalid:
-			conn.Close()
+		switch p.Next() {
+		case parser.Invalid, parser.Finish:
 			return
 
-		case number == terminate:
+		case parser.Terminate:
 			close(s.terminate)
 			s.Close()
+			return
 
-		default:
-			numbers <- number
+		case parser.Number:
+			numbers <- p.Number
 		}
 	}
 }
