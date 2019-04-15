@@ -26,7 +26,7 @@ func New(reader io.Reader) (p *Parser) {
 }
 
 // Next ...
-func (p Parser) Next() string {
+func (p *Parser) Next() string {
 	token, err := p.ReadString('\n')
 	if err != nil || len(token) != 10 {
 		return Invalid
