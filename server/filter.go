@@ -5,7 +5,7 @@ import "fmt"
 func (s *Service) filter(numbers <-chan int, uniques chan<- int) {
 	for number := range numbers {
 		fmt.Fprintln(s.input, number)
-		if s.remembers(number) {
+		if s.Remembers(number) {
 			s.Duplicates++
 		} else {
 			s.Uniques++

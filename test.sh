@@ -1,12 +1,16 @@
 #!/bin/bash
 
+DUMP=/tmp/dump
+INPUT=/tmp/input
+OUTPUT=/tmp/output
+
 go run main.go client &
-testing=true go run main.go server 
+go run main.go server 
 
-input  () { sort input  | uniq ; }
-output () { sort numbers.log; }
+input  () { sort $INPUT  | uniq ; }
+output () { sort $OUTPUT; }
 
-echo "Sent     $(wc -l input) numbers"
+echo "Sent     $(wc -l $INPUT) numbers"
 echo "Sent     $(input |  wc -l) unique numbers"
 echo "Received $(output | wc -l) unique numbers"
 if cmp -s <(input) <(output); then
@@ -15,4 +19,4 @@ else
     echo FAIL
 fi
 
-rm input numbers.log dump.gz
+rm $INPUT $OUTPUT $DUMP

@@ -3,6 +3,8 @@ package server
 import (
 	"io"
 	"net"
+
+	"github.com/agoca80/tc1/memory"
 )
 
 // Service ...
@@ -14,24 +16,22 @@ type Service struct {
 	input  io.Writer
 	output io.Writer
 
-	Memory
+	memory.Persistent
 }
 
 // New ...
-func New(listener net.Listener, input, output io.Writer) *Service {
-
+func New(listener net.Listener, input, output io.Writer, memory memory.Persistent) *Service {
 	return &Service{
-		Listener:  listener,
-		terminate: make(chan bool),
-		input:     input,
-		output:    output,
+		Listener:   listener,
+		Persistent: memory,
+		terminate:  make(chan bool),
+		input:      input,
+		output:     output,
 	}
 }
 
 // Start ...
 func (s *Service) Start() {
-	s.remind()
-
 	var (
 		clients = make(chan io.ReadCloser)
 		numbers = make(chan int, 5*1024)
@@ -48,9 +48,9 @@ func (s *Service) Start() {
 	NewWorker(func() { s.filter(numbers, uniques) })
 
 	s.record(uniques)
-	s.store()
 }
 
+// Running ...
 func (s *Service) Running() bool {
 	select {
 	case <-s.terminate:

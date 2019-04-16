@@ -4,18 +4,31 @@ import (
 	"net"
 	"os"
 
+	"github.com/agoca80/tc1/memory"
+
 	"github.com/agoca80/tc1/client"
 	"github.com/agoca80/tc1/server"
 )
 
+const (
+	in   = "/tmp/input"
+	out  = "/tmp/output"
+	dump = "/tmp/dump"
+)
+
 // Server ...
 func Server() {
-	output, err := os.OpenFile("numbers.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	memory, err := memory.NewMemory(dump)
 	if err != nil {
 		panic(err)
 	}
 
-	input, err := os.OpenFile("input", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	output, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	input, err := os.OpenFile(in, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -25,8 +38,13 @@ func Server() {
 		panic(err)
 	}
 
-	service := server.New(listener, input, output)
+	service := server.New(listener, input, output, memory)
 	service.Start()
+
+	err = service.Store(dump)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Client ...
