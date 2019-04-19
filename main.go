@@ -1,9 +1,13 @@
 package main
 
 import (
-	"os"
+	"flag"
 
 	"github.com/agoca80/tc1/client"
+)
+
+var (
+	server = flag.Bool("server", false, "Run the server instead of the client")
 )
 
 const (
@@ -11,16 +15,19 @@ const (
 	out     = "/tmp/output"
 	dump    = "/tmp/dump"
 	clients = 5
+	reports = 100
 	size    = 1000000000
 )
 
-// Client ...
-func Client() { client.Start() }
+func init() {
+	flag.Parse()
+}
 
 func main() {
-	if len(os.Args) < 2 || os.Args[1] == "server" {
+	switch *server {
+	case true:
 		Server()
-	} else {
-		Client()
+	case false:
+		client.Start()
 	}
 }

@@ -27,7 +27,7 @@ func Server() {
 		panic(err)
 	}
 
-	srv := service.New(clients, listener, input, output, memory)
+	srv := service.New(clients, reports, size, listener, input, output, memory)
 	srv.Start()
 
 	err = srv.Memory.Dump(dump)
