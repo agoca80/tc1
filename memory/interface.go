@@ -1,28 +1,16 @@
 package memory
 
-// Memory ...
-type Memory interface {
+// Interface ...
+type Interface interface {
 	Remembers(int) bool
-}
-
-// Stats ...
-type Stats interface {
-}
-
-// Persistent ...
-type Persistent interface {
-	Memory
-	Stats
-	Load(dump string) error
-	Store(dump string) error
+	Load(string) error
+	Dump(string) error
+	Stats() Statistics
 }
 
 // NewMemory ...
-func NewMemory(dump string) (Persistent, error) {
-	memory := &persistent{
-		memory: newMemory(),
+func NewMemory(size int) Interface {
+	return &memory{
+		Bitmap: newBitmap(size),
 	}
-
-	err := memory.Load(dump)
-	return memory, err
 }

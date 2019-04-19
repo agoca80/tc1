@@ -17,18 +17,18 @@ type Service struct {
 	input  io.Writer
 	output io.Writer
 
-	memory.Persistent
+	Memory memory.Interface
 }
 
 // New ...
-func New(size int, listener net.Listener, input, output io.Writer, memory memory.Persistent) *Service {
+func New(size int, listener net.Listener, input, output io.Writer, memory memory.Interface) *Service {
 	return &Service{
-		size:       size,
-		Listener:   listener,
-		Persistent: memory,
-		terminate:  make(chan bool),
-		input:      input,
-		output:     output,
+		size:      size,
+		Listener:  listener,
+		Memory:    memory,
+		terminate: make(chan bool),
+		input:     input,
+		output:    output,
 	}
 }
 

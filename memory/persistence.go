@@ -3,19 +3,15 @@ package memory
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/binary"
-	"io/ioutil"
+	"encoding/gob"
 	"os"
 )
 
-type persistent struct {
-	memory
-}
-
-// Store ...
-func (p persistent) Store(dump string) (err error) {
+// Dump ...
+func (m *memory) Dump(dump string) (err error) {
 	buffer := new(bytes.Buffer)
-	err = binary.Write(buffer, binary.BigEndian, p.memory)
+	encoder := gob.NewEncoder(buffer)
+	err = encoder.Encode(m)
 	if err != nil {
 		return
 	}
@@ -36,7 +32,7 @@ func (p persistent) Store(dump string) (err error) {
 	return
 }
 
-func (p persistent) Load(dump string) (err error) {
+func (m *memory) Load(dump string) (err error) {
 	_, err = os.Stat(dump)
 	if os.IsNotExist(err) {
 		return nil
@@ -45,17 +41,19 @@ func (p persistent) Load(dump string) (err error) {
 		return
 	}
 
-	load, err := ioutil.ReadFile(dump)
+	file, err := os.OpenFile(dump, os.O_RDONLY, 0644)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	gz, err := gzip.NewReader(file)
 	if err != nil {
 		return
 	}
 
-	gz, err := gzip.NewReader(bytes.NewBuffer(load))
-	if err != nil {
-		return
-	}
-
-	err = binary.Read(gz, binary.BigEndian, &p.memory)
+	decoder := gob.NewDecoder(gz)
+	err = decoder.Decode(m)
 	if err != nil {
 		return
 	}

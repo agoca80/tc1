@@ -11,6 +11,7 @@ const (
 	out     = "/tmp/output"
 	dump    = "/tmp/dump"
 	clients = 5
+	size    = 1000000000
 )
 
 // Client ...

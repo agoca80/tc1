@@ -10,10 +10,7 @@ import (
 
 // Server ...
 func Server() {
-	memory, err := memory.NewMemory(dump)
-	if err != nil {
-		panic(err)
-	}
+	memory := memory.NewMemory(size)
 
 	output, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -33,7 +30,7 @@ func Server() {
 	srv := service.New(clients, listener, input, output, memory)
 	srv.Start()
 
-	err = srv.Store(dump)
+	err = srv.Memory.Dump(dump)
 	if err != nil {
 		panic(err)
 	}
