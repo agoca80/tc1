@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/agoca80/tc1/memory"
-	"github.com/agoca80/tc1/server"
+	"github.com/agoca80/tc1/service"
 )
 
 // Server ...
@@ -30,10 +30,10 @@ func Server() {
 		panic(err)
 	}
 
-	service := server.New(listener, input, output, memory)
-	service.Start()
+	srv := service.New(listener, input, output, memory)
+	srv.Start()
 
-	err = service.Store(dump)
+	err = srv.Store(dump)
 	if err != nil {
 		panic(err)
 	}
