@@ -38,14 +38,14 @@ func (s *Service) Start() {
 		uniques = make(chan int)
 	)
 
-	NewWorker(func() { s.reporter(Report) })
-	NewWorker(func() { s.dispatcher(clients) })
-	NewWorker(NewPool(
+	go s.reporter(Report)
+	go s.dispatcher(clients)
+	go NewPool(
 		Clients,
 		func() { s.process(clients, numbers) },
 		func() { close(numbers) },
-	))
-	NewWorker(func() { s.filter(numbers, uniques) })
+	)
+	go s.filter(numbers, uniques)
 
 	s.record(uniques)
 }
