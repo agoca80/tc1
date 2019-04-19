@@ -11,7 +11,7 @@ func (s *Service) newPool(clients <-chan io.ReadCloser, numbers chan<- int) {
 		pool.Add(1)
 		go func() {
 			s.process(clients, numbers)
-			close(numbers)
+			pool.Done()
 		}()
 	}
 
