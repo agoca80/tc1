@@ -9,6 +9,7 @@ import (
 
 // Service ...
 type Service struct {
+	size      int
 	terminate chan bool
 	Stats
 
@@ -20,8 +21,9 @@ type Service struct {
 }
 
 // New ...
-func New(listener net.Listener, input, output io.Writer, memory memory.Persistent) *Service {
+func New(size int, listener net.Listener, input, output io.Writer, memory memory.Persistent) *Service {
 	return &Service{
+		size:       size,
 		Listener:   listener,
 		Persistent: memory,
 		terminate:  make(chan bool),
@@ -40,11 +42,7 @@ func (s *Service) Start() {
 
 	go s.reporter(Report)
 	go s.dispatcher(clients)
-	go NewPool(
-		Clients,
-		func() { s.process(clients, numbers) },
-		func() { close(numbers) },
-	)
+	go s.newPool(clients, numbers)
 	go s.filter(numbers, uniques)
 
 	s.record(uniques)

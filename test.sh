@@ -4,8 +4,9 @@ DUMP=/tmp/dump
 INPUT=/tmp/input
 OUTPUT=/tmp/output
 
-go run main.go client &
-go run main.go server 
+go build
+./tc1 client &
+./tc1 server 
 
 input  () { sort $INPUT  | uniq ; }
 output () { sort $OUTPUT; }

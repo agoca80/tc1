@@ -1,20 +1,22 @@
 package service
 
-import "sync"
+import (
+	"io"
+	"sync"
+)
 
-// NewPool ...
-func NewPool(size int, work func(), finish func()) func() {
+func (s *Service) newPool(clients <-chan io.ReadCloser, numbers chan<- int) {
 	var pool sync.WaitGroup
-	for ; 0 < size; size-- {
+	for i := 0; i < s.size; i++ {
 		pool.Add(1)
 		go func() {
-			work()
-			pool.Done()
+			s.process(clients, numbers)
+			close(numbers)
 		}()
 	}
 
-	return func() {
+	go func() {
 		pool.Wait()
-		finish()
-	}
+		close(numbers)
+	}()
 }

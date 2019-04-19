@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	in   = "/tmp/input"
-	out  = "/tmp/output"
-	dump = "/tmp/dump"
+	in      = "/tmp/input"
+	out     = "/tmp/output"
+	dump    = "/tmp/dump"
+	clients = 5
 )
 
 // Client ...
