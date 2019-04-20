@@ -24,10 +24,7 @@ func init() {
 }
 
 func main() {
-	switch *server {
-	case true:
-		Server()
-	case false:
-		client.Start()
-	}
+	go client.Start()
+
+	Server()
 }

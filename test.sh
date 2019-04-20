@@ -5,8 +5,7 @@ INPUT=/tmp/input
 OUTPUT=/tmp/output
 
 go build
-./tc1 &
-./tc1 -server 
+./tc1
 
 input  () { sort $INPUT  | uniq ; }
 output () { sort $OUTPUT; }
