@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	server = flag.Bool("server", false, "Run the server instead of the client")
+	during = flag.Int("t", 1, "Send termination signal after t seconds")
+	wait   = flag.Int("w", 1, "microseconds between client numbers")
 )
 
 const (
@@ -24,7 +25,7 @@ func init() {
 }
 
 func main() {
-	go client.Start()
+	go client.Start(*during, *wait)
 
 	Server()
 }

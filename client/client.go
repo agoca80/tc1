@@ -46,7 +46,7 @@ func taste() {
 }
 
 // Start ...
-func Start() {
+func Start(during, wait int) {
 	die := make(chan bool)
 	generator := Random()
 	minion := func() {
@@ -62,7 +62,7 @@ func Start() {
 				return
 			default:
 				Send(conn, generator.Number())
-				//time.Sleep(time.Microsecond)
+				time.Sleep(time.Duration(wait) * time.Microsecond)
 			}
 		}
 	}
@@ -72,7 +72,7 @@ func Start() {
 		go minion()
 	}
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(time.Duration(during) * time.Second)
 	close(die)
 	Terminate()
 }
