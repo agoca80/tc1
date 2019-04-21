@@ -1,11 +1,31 @@
 package service
 
-import "io"
+import (
+	"io"
+	"net"
+)
 
-func (s *Service) dispatcher(clients chan<- io.ReadCloser) {
+type dispatcher struct {
+	net.Listener
+	runner
+}
+
+func newDispatcher(leader runner) *dispatcher {
+	listener, err := net.Listen("tcp", ":4000")
+	if err != nil {
+		panic(err)
+	}
+
+	return &dispatcher{
+		Listener: listener,
+		runner:   leader,
+	}
+}
+
+func (d *dispatcher) run(clients chan<- io.ReadCloser) {
 	defer close(clients)
-	for s.Running() {
-		client, err := s.Accept()
+	for d.Running() {
+		client, err := d.Accept()
 		switch {
 
 		case err != nil && err.Error() == "use of closed network connection":

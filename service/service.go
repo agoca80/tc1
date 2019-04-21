@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 	"io"
-	"net"
 	"time"
 
 	"github.com/agoca80/tc1/memory"
@@ -14,25 +13,27 @@ type Service struct {
 	reports time.Duration
 	workers int
 
-	net.Listener
 	input  io.Writer
 	output io.Writer
 
 	Memory memory.Interface
 
 	runner
+	*dispatcher
 }
 
 // New ...
-func New(workers, reports, size int, listener net.Listener, input, output io.Writer, memory memory.Interface) *Service {
+func New(workers, reports, size int, input, output io.Writer, memory memory.Interface) *Service {
+	service := newRunner()
+
 	return &Service{
-		reports:  time.Duration(reports) * time.Millisecond,
-		Listener: listener,
-		Memory:   memory,
-		input:    input,
-		output:   output,
-		workers:  workers,
-		runner:   newRunner(),
+		reports:    time.Duration(reports) * time.Millisecond,
+		Memory:     memory,
+		input:      input,
+		output:     output,
+		workers:    workers,
+		runner:     service,
+		dispatcher: newDispatcher(service),
 	}
 }
 
@@ -45,7 +46,7 @@ func (s *Service) Start() {
 		report  = s.reporter()
 	)
 
-	go s.dispatcher(clients)
+	go s.dispatcher.run(clients)
 	go s.newPool(clients, numbers)
 	go s.filter(numbers, uniques)
 	go s.record(uniques)
