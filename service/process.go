@@ -6,28 +6,27 @@ import (
 	"github.com/agoca80/tc1/parser"
 )
 
-func (s *Service) process(clients <-chan io.ReadCloser, numbers chan<- int) {
+func (p *pool) process(clients <-chan io.ReadCloser, numbers chan<- int) {
 	for client := range clients {
-		s.serialize(client, numbers)
+		p.serialize(client, numbers)
 		client.Close()
 	}
 }
 
-func (s *Service) serialize(client io.Reader, numbers chan<- int) {
-	p := parser.New(client)
+func (p *pool) serialize(client io.Reader, numbers chan<- int) {
+	stream := parser.New(client)
 
-	for s.Running() {
-		switch p.Next() {
+	for p.Running() {
+		switch stream.Next() {
 		case parser.Invalid, parser.Finish:
 			return
 
 		case parser.Terminate:
-			s.Close()
-			s.Stop()
+			p.Stop()
 			return
 
 		case parser.Number:
-			numbers <- p.Number
+			numbers <- stream.Number
 		}
 	}
 }

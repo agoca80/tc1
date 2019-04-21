@@ -5,18 +5,31 @@ import (
 	"sync"
 )
 
-func (s *Service) newPool(clients <-chan io.ReadCloser, numbers chan<- int) {
-	var pool sync.WaitGroup
-	for i := 0; i < s.workers; i++ {
-		pool.Add(1)
+type pool struct {
+	size int
+
+	runner
+	sync.WaitGroup
+}
+
+func newPool(size int, leader runner) *pool {
+	return &pool{
+		runner: leader,
+		size:   size,
+	}
+}
+
+func (p *pool) run(clients <-chan io.ReadCloser, numbers chan<- int) {
+	for i := 0; i < p.size; i++ {
+		p.Add(1)
 		go func() {
-			s.process(clients, numbers)
-			pool.Done()
+			p.process(clients, numbers)
+			p.Done()
 		}()
 	}
 
 	go func() {
-		pool.Wait()
+		p.Wait()
 		close(numbers)
 	}()
 }

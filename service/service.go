@@ -20,6 +20,7 @@ type Service struct {
 
 	runner
 	*dispatcher
+	*pool
 }
 
 // New ...
@@ -34,6 +35,7 @@ func New(workers, reports, size int, input, output io.Writer, memory memory.Inte
 		workers:    workers,
 		runner:     service,
 		dispatcher: newDispatcher(service),
+		pool:       newPool(workers, service),
 	}
 }
 
@@ -47,7 +49,7 @@ func (s *Service) Start() {
 	)
 
 	go s.dispatcher.run(clients)
-	go s.newPool(clients, numbers)
+	go s.pool.run(clients, numbers)
 	go s.filter(numbers, uniques)
 	go s.record(uniques)
 
@@ -57,6 +59,7 @@ func (s *Service) Start() {
 		select {
 
 		case <-s.runner:
+			s.dispatcher.Close()
 			report()
 			return
 
