@@ -13,8 +13,7 @@ import (
 type Service struct {
 	reports   time.Duration
 	terminate chan bool
-	Stats
-	workers int
+	workers   int
 
 	net.Listener
 	input  io.Writer
@@ -42,6 +41,7 @@ func (s *Service) Start() {
 		clients = make(chan io.ReadCloser)
 		numbers = make(chan int, s.workers)
 		uniques = make(chan int)
+		report  = s.reporter()
 	)
 
 	go s.dispatcher(clients)
@@ -55,13 +55,26 @@ func (s *Service) Start() {
 		select {
 
 		case <-s.terminate:
+			report()
 			return
 
 		case <-clock.C:
-			fmt.Println(s)
-			s.Uniques, s.Duplicates = 0, 0
-
+			report()
 		}
+	}
+}
+
+func (s *Service) reporter() func() {
+	var stats memory.Statistics
+	return func() {
+		current := s.Memory.Stats()
+		fmt.Printf(
+			"Received %v unique numbers, %v duplicates. Unique total: %v\n",
+			current.Uniques-stats.Uniques,
+			current.Duplicates-stats.Duplicates,
+			current.Uniques,
+		)
+		stats = current
 	}
 }
 
