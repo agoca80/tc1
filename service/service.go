@@ -11,27 +11,28 @@ import (
 
 // Service ...
 type Service struct {
-	reports   time.Duration
-	terminate chan bool
-	workers   int
+	reports time.Duration
+	workers int
 
 	net.Listener
 	input  io.Writer
 	output io.Writer
 
 	Memory memory.Interface
+
+	runner
 }
 
 // New ...
 func New(workers, reports, size int, listener net.Listener, input, output io.Writer, memory memory.Interface) *Service {
 	return &Service{
-		reports:   time.Duration(reports) * time.Millisecond,
-		Listener:  listener,
-		Memory:    memory,
-		terminate: make(chan bool),
-		input:     input,
-		output:    output,
-		workers:   workers,
+		reports:  time.Duration(reports) * time.Millisecond,
+		Listener: listener,
+		Memory:   memory,
+		input:    input,
+		output:   output,
+		workers:  workers,
+		runner:   newRunner(),
 	}
 }
 
@@ -54,7 +55,7 @@ func (s *Service) Start() {
 	for {
 		select {
 
-		case <-s.terminate:
+		case <-s.runner:
 			report()
 			return
 
@@ -75,15 +76,5 @@ func (s *Service) reporter() func() {
 			current.Uniques,
 		)
 		stats = current
-	}
-}
-
-// Running ...
-func (s *Service) Running() bool {
-	select {
-	case <-s.terminate:
-		return false
-	default:
-		return true
 	}
 }

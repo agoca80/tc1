@@ -22,8 +22,8 @@ func (s *Service) serialize(client io.Reader, numbers chan<- int) {
 			return
 
 		case parser.Terminate:
-			close(s.terminate)
 			s.Close()
+			s.Stop()
 			return
 
 		case parser.Number:
