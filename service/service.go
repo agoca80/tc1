@@ -11,11 +11,10 @@ import (
 
 // Service ...
 type Service struct {
-	clients   int
 	reports   time.Duration
-	size      int
 	terminate chan bool
 	Stats
+	workers int
 
 	net.Listener
 	input  io.Writer
@@ -25,16 +24,15 @@ type Service struct {
 }
 
 // New ...
-func New(clients, reports, size int, listener net.Listener, input, output io.Writer, memory memory.Interface) *Service {
+func New(workers, reports, size int, listener net.Listener, input, output io.Writer, memory memory.Interface) *Service {
 	return &Service{
-		size:      size,
-		clients:   clients,
 		reports:   time.Duration(reports) * time.Millisecond,
 		Listener:  listener,
 		Memory:    memory,
 		terminate: make(chan bool),
 		input:     input,
 		output:    output,
+		workers:   workers,
 	}
 }
 
@@ -42,7 +40,7 @@ func New(clients, reports, size int, listener net.Listener, input, output io.Wri
 func (s *Service) Start() {
 	var (
 		clients = make(chan io.ReadCloser)
-		numbers = make(chan int, s.clients)
+		numbers = make(chan int, s.workers)
 		uniques = make(chan int)
 	)
 
