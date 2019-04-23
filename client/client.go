@@ -6,6 +6,8 @@ import (
 	"net"
 	"os"
 	"time"
+
+	"github.com/agoca80/tc1/service"
 )
 
 // PanicOnErr if there is an error during send
@@ -45,34 +47,33 @@ func taste() {
 	}
 }
 
-// Start ...
-func Start(during, wait int) {
-	die := make(chan bool)
-	generator := Random()
-	minion := func() {
-		conn, err := net.Dial("tcp", Address)
-		if err != nil {
-			panic(err)
-		}
-		defer conn.Close()
+// minion ...
+func minion(during, wait int, leader service.Runner, generator Generator) {
+	conn, err := net.Dial("tcp", Address)
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
 
-		for {
-			select {
-			case <-die:
-				return
-			default:
-				Send(conn, generator.Number())
-				time.Sleep(time.Duration(wait) * time.Microsecond)
-			}
+	for leader.Running() {
+		Send(conn, generator.Number())
+		if wait > 0 {
+			time.Sleep(time.Duration(wait) * time.Microsecond)
 		}
 	}
+}
+
+// Start ...
+func Start(during, wait int) {
+	platoon := service.NewRunner()
+	generator := Random()
 
 	taste()
 	for i := 0; i < 5; i++ {
-		go minion()
+		go minion(during, wait, platoon, generator)
 	}
 
 	time.Sleep(time.Duration(during) * time.Second)
-	close(die)
+	platoon.Stop()
 	Terminate()
 }
