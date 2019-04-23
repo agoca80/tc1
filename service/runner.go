@@ -1,12 +1,15 @@
 package service
 
-type runner chan struct{}
+// Runner ...
+type Runner chan struct{}
 
-func newRunner() runner {
-	return make(runner)
+// NewRunner ...
+func NewRunner() Runner {
+	return make(Runner)
 }
 
-func (r runner) Running() bool {
+// Running ...
+func (r Runner) Running() bool {
 	select {
 	case <-r:
 		return false
@@ -15,7 +18,8 @@ func (r runner) Running() bool {
 	}
 }
 
-func (r runner) Stop() {
+// Stop ...
+func (r Runner) Stop() {
 	if r.Running() {
 		close(r)
 	}

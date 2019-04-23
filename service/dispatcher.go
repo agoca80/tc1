@@ -7,10 +7,10 @@ import (
 
 type dispatcher struct {
 	net.Listener
-	runner
+	Runner
 }
 
-func newDispatcher(leader runner) *dispatcher {
+func newDispatcher(leader Runner) *dispatcher {
 	listener, err := net.Listen("tcp", ":4000")
 	if err != nil {
 		panic(err)
@@ -18,7 +18,7 @@ func newDispatcher(leader runner) *dispatcher {
 
 	return &dispatcher{
 		Listener: listener,
-		runner:   leader,
+		Runner:   leader,
 	}
 }
 

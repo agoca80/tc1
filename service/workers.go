@@ -8,13 +8,13 @@ import (
 type pool struct {
 	size int
 
-	runner
+	Runner
 	sync.WaitGroup
 }
 
-func newPool(size int, leader runner) *pool {
+func newPool(size int, leader Runner) *pool {
 	return &pool{
-		runner: leader,
+		Runner: leader,
 		size:   size,
 	}
 }

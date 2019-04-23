@@ -18,14 +18,14 @@ type Service struct {
 
 	Memory memory.Interface
 
-	runner
+	Runner
 	*dispatcher
 	*pool
 }
 
 // New ...
 func New(workers, reports, size int, input, output io.Writer, memory memory.Interface) *Service {
-	service := newRunner()
+	service := NewRunner()
 
 	return &Service{
 		reports:    time.Duration(reports) * time.Millisecond,
@@ -33,7 +33,7 @@ func New(workers, reports, size int, input, output io.Writer, memory memory.Inte
 		input:      input,
 		output:     output,
 		workers:    workers,
-		runner:     service,
+		Runner:     service,
 		dispatcher: newDispatcher(service),
 		pool:       newPool(workers, service),
 	}
@@ -58,7 +58,7 @@ func (s *Service) Start() {
 	for {
 		select {
 
-		case <-s.runner:
+		case <-s.Runner:
 			s.dispatcher.Close()
 			report()
 			return
