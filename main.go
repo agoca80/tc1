@@ -9,6 +9,7 @@ import (
 var (
 	during = flag.Int("t", 1, "Send termination signal after t seconds")
 	wait   = flag.Int("w", 1, "microseconds between client numbers")
+	size   = flag.Int("r", 1000000, "range of numbers")
 )
 
 const (
@@ -17,7 +18,6 @@ const (
 	dump    = "/tmp/dump"
 	clients = 5
 	reports = 100
-	size    = 1000000000
 )
 
 func init() {
@@ -25,7 +25,7 @@ func init() {
 }
 
 func main() {
-	go client.Start(*during, *wait)
+	go client.Start(*during, *wait, *size)
 
 	Server()
 }

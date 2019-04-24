@@ -1,16 +1,11 @@
 package memory
 
-// Interface ...
-type Interface interface {
+// Memory ...
+type Memory interface {
 	Remembers(int) bool
-	Load(string) error
-	Dump(string) error
-	Stats() Statistics
 }
 
 // NewMemory ...
-func NewMemory(size int) Interface {
-	return &memory{
-		Bitmap: newBitmap(size),
-	}
+func NewMemory(size int) Memory {
+	return newBitmap(size)
 }

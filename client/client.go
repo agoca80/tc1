@@ -64,9 +64,9 @@ func minion(during, wait int, leader service.Runner, generator Generator) {
 }
 
 // Start ...
-func Start(during, wait int) {
+func Start(during, wait int, size int) {
 	platoon := service.NewRunner()
-	generator := Random()
+	generator := Random(size)
 
 	taste()
 	for i := 0; i < 5; i++ {

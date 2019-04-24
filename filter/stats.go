@@ -1,4 +1,4 @@
-package memory
+package filter
 
 // Statistics ...
 type Statistics struct {
@@ -7,6 +7,6 @@ type Statistics struct {
 }
 
 // Stats ...
-func (m *memory) Stats() Statistics {
-	return m.Statistics
+func (f *filter) Stats() Statistics {
+	return f.Statistics
 }

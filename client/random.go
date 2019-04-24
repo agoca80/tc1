@@ -5,13 +5,13 @@ import (
 	"math/rand"
 )
 
-type random struct{}
+type random int
 
 // Random ...
-func Random() Generator {
-	return &random{}
+func Random(size int) Generator {
+	return random(size)
 }
 
-func (r *random) Number() []byte {
-	return []byte(fmt.Sprintf("%09d\n", rand.Intn(1000000000)))
+func (r random) Number() []byte {
+	return []byte(fmt.Sprintf("%09d\n", rand.Intn(int(r))))
 }

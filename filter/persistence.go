@@ -1,4 +1,4 @@
-package memory
+package filter
 
 import (
 	"bytes"
@@ -8,10 +8,10 @@ import (
 )
 
 // Dump ...
-func (m *memory) Dump(dump string) (err error) {
+func (f *filter) Dump(dump string) (err error) {
 	buffer := new(bytes.Buffer)
 	encoder := gob.NewEncoder(buffer)
-	err = encoder.Encode(m)
+	err = encoder.Encode(f.Memory)
 	if err != nil {
 		return
 	}
@@ -32,7 +32,7 @@ func (m *memory) Dump(dump string) (err error) {
 	return
 }
 
-func (m *memory) Load(dump string) (err error) {
+func (f *filter) Load(dump string) (err error) {
 	_, err = os.Stat(dump)
 	if os.IsNotExist(err) {
 		return nil
@@ -53,7 +53,7 @@ func (m *memory) Load(dump string) (err error) {
 	}
 
 	decoder := gob.NewDecoder(gz)
-	err = decoder.Decode(m)
+	err = decoder.Decode(f)
 	if err != nil {
 		return
 	}
