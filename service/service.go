@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/agoca80/tc1/filter"
+	"github.com/agoca80/tc1/runner"
 )
 
 // Service ...
@@ -14,7 +15,6 @@ type Service struct {
 
 	output io.Writer
 
-	Runner
 	*dispatcher
 	*pool
 	filter.Filter
@@ -22,7 +22,7 @@ type Service struct {
 
 // New ...
 func New(workers, reports, size int, input string, output io.Writer) (s *Service, err error) {
-	service := NewRunner()
+	service := runner.New()
 	filter := filter.New(input, size)
 
 	s = &Service{
@@ -30,7 +30,6 @@ func New(workers, reports, size int, input string, output io.Writer) (s *Service
 		reports:    time.Duration(reports) * time.Millisecond,
 		output:     output,
 		workers:    workers,
-		Runner:     service,
 		dispatcher: newDispatcher(service),
 		pool:       newPool(workers, service),
 	}
@@ -41,6 +40,7 @@ func New(workers, reports, size int, input string, output io.Writer) (s *Service
 // Start ...
 func (s *Service) Start() {
 	var (
+		service = runner.New()
 		clients = make(chan io.ReadCloser)
 		numbers = make(chan int, s.workers)
 		uniques = make(chan int)
@@ -57,7 +57,7 @@ func (s *Service) Start() {
 	for {
 		select {
 
-		case <-s.Runner:
+		case <-service:
 			s.dispatcher.Close()
 			report()
 			return

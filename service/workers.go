@@ -3,18 +3,20 @@ package service
 import (
 	"io"
 	"sync"
+
+	"github.com/agoca80/tc1/runner"
 )
 
 type pool struct {
 	size int
 
-	Runner
+	runner.Runner
 	sync.WaitGroup
 }
 
-func newPool(size int, leader Runner) *pool {
+func newPool(size int, service runner.Runner) *pool {
 	return &pool{
-		Runner: leader,
+		Runner: service,
 		size:   size,
 	}
 }

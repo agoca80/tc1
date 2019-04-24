@@ -3,14 +3,16 @@ package service
 import (
 	"io"
 	"net"
+
+	"github.com/agoca80/tc1/runner"
 )
 
 type dispatcher struct {
 	net.Listener
-	Runner
+	runner.Runner
 }
 
-func newDispatcher(leader Runner) *dispatcher {
+func newDispatcher(service runner.Runner) *dispatcher {
 	listener, err := net.Listen("tcp", ":4000")
 	if err != nil {
 		panic(err)
@@ -18,7 +20,7 @@ func newDispatcher(leader Runner) *dispatcher {
 
 	return &dispatcher{
 		Listener: listener,
-		Runner:   leader,
+		Runner:   service,
 	}
 }
 

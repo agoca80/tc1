@@ -1,10 +1,10 @@
-package service
+package runner
 
 // Runner ...
 type Runner chan struct{}
 
-// NewRunner ...
-func NewRunner() Runner {
+// New ...
+func New() Runner {
 	return make(Runner)
 }
 
