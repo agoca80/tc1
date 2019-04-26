@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/agoca80/tc1/dispatcher"
+	"github.com/agoca80/tc1/process"
 
 	"github.com/agoca80/tc1/recorder"
 
@@ -18,10 +19,8 @@ type Service struct {
 	reports time.Duration
 	workers int
 
-	output io.Writer
-
 	dispatcher.Dispatcher
-	*pool
+	process.Pool
 	filter.Filter
 	recorder.Recorder
 }
@@ -37,11 +36,11 @@ func New(workers, reports, size int, input, output string) (s *Service, err erro
 
 	s = &Service{
 		Runner:     service,
-		Filter:     filter.New(input, size),
 		reports:    time.Duration(reports) * time.Millisecond,
 		workers:    workers,
 		Dispatcher: dispatcher.New(service),
-		pool:       newPool(workers, service),
+		Pool:       process.New(workers, service),
+		Filter:     filter.New(input, size),
 		Recorder:   recorder,
 	}
 
@@ -58,7 +57,7 @@ func (s *Service) Start() {
 	)
 
 	go s.Dispatch(clients)
-	go s.pool.run(clients, numbers)
+	go s.Process(clients, numbers)
 	go s.Filter.Run(numbers, uniques)
 	go s.Record(uniques)
 

@@ -1,4 +1,4 @@
-package service
+package process
 
 import (
 	"io"
@@ -14,14 +14,16 @@ type pool struct {
 	sync.WaitGroup
 }
 
-func newPool(size int, service runner.Runner) *pool {
+// New ...
+func New(size int, service runner.Runner) Pool {
 	return &pool{
 		Runner: service,
 		size:   size,
 	}
 }
 
-func (p *pool) run(clients <-chan io.ReadCloser, numbers chan<- int) {
+// Process ...
+func (p *pool) Process(clients <-chan io.ReadCloser, numbers chan<- int) {
 	for i := 0; i < p.size; i++ {
 		p.Add(1)
 		go func() {
