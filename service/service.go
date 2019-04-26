@@ -37,7 +37,6 @@ func New(workers, reports, size int, input, output string) (s *Service, err erro
 	s = &Service{
 		Runner:     service,
 		reports:    time.Duration(reports) * time.Millisecond,
-		workers:    workers,
 		Dispatcher: dispatcher.New(service),
 		Pool:       process.New(workers, service),
 		Filter:     filter.New(input, size),
