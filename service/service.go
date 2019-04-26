@@ -53,15 +53,15 @@ func (s *Service) Start() {
 		numbers = make(chan int, s.workers)
 		uniques = make(chan int)
 		report  = s.reporter()
+		clock   = time.NewTicker(s.reports)
 	)
+	defer clock.Stop()
 
 	go s.Dispatch(clients)
 	go s.Process(clients, numbers)
 	go s.Filter.Run(numbers, uniques)
 	go s.Record(uniques)
 
-	clock := time.NewTicker(s.reports)
-	defer clock.Stop()
 	for {
 		select {
 
