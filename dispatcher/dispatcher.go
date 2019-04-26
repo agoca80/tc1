@@ -1,4 +1,4 @@
-package service
+package dispatcher
 
 import (
 	"io"
@@ -24,8 +24,7 @@ func newDispatcher(service runner.Runner) *dispatcher {
 	}
 }
 
-func (d *dispatcher) run(clients chan<- io.ReadCloser) {
-	defer close(clients)
+func (d *dispatcher) Dispatch(clients chan<- io.ReadCloser) {
 	for d.Running() {
 		client, err := d.Accept()
 		switch {
@@ -38,4 +37,5 @@ func (d *dispatcher) run(clients chan<- io.ReadCloser) {
 
 		}
 	}
+	close(clients)
 }
