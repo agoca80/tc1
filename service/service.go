@@ -4,12 +4,15 @@ import (
 	"io"
 	"time"
 
+	"github.com/agoca80/tc1/recorder"
+
 	"github.com/agoca80/tc1/filter"
 	"github.com/agoca80/tc1/runner"
 )
 
 // Service ...
 type Service struct {
+	runner.Runner
 	reports time.Duration
 	workers int
 
@@ -18,20 +21,26 @@ type Service struct {
 	*dispatcher
 	*pool
 	filter.Filter
+	recorder.Recorder
 }
 
 // New ...
-func New(workers, reports, size int, input string, output io.Writer) (s *Service, err error) {
+func New(workers, reports, size int, input, output string) (s *Service, err error) {
+	recorder, err := recorder.New(output)
+	if err != nil {
+		return
+	}
+
 	service := runner.New()
-	filter := filter.New(input, size)
 
 	s = &Service{
-		Filter:     filter,
+		Runner:     service,
+		Filter:     filter.New(input, size),
 		reports:    time.Duration(reports) * time.Millisecond,
-		output:     output,
 		workers:    workers,
 		dispatcher: newDispatcher(service),
 		pool:       newPool(workers, service),
+		Recorder:   recorder,
 	}
 
 	return
@@ -40,7 +49,6 @@ func New(workers, reports, size int, input string, output io.Writer) (s *Service
 // Start ...
 func (s *Service) Start() {
 	var (
-		service = runner.New()
 		clients = make(chan io.ReadCloser)
 		numbers = make(chan int, s.workers)
 		uniques = make(chan int)
@@ -50,14 +58,14 @@ func (s *Service) Start() {
 	go s.dispatcher.run(clients)
 	go s.pool.run(clients, numbers)
 	go s.Filter.Run(numbers, uniques)
-	go s.record(uniques)
+	go s.Record(uniques)
 
 	clock := time.NewTicker(s.reports)
 	defer clock.Stop()
 	for {
 		select {
 
-		case <-service:
+		case <-s.Runner:
 			s.dispatcher.Close()
 			report()
 			return
