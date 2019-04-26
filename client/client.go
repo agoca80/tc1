@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/agoca80/tc1/service"
+	"github.com/agoca80/tc1/runner"
 )
 
 // PanicOnErr if there is an error during send
@@ -48,7 +48,7 @@ func taste() {
 }
 
 // minion ...
-func minion(during, wait int, leader service.Runner, generator Generator) {
+func minion(during, wait int, leader runner.Runner, generator Generator) {
 	conn, err := net.Dial("tcp", Address)
 	if err != nil {
 		panic(err)
@@ -65,7 +65,7 @@ func minion(during, wait int, leader service.Runner, generator Generator) {
 
 // Start ...
 func Start(during, wait int, size int) {
-	platoon := service.NewRunner()
+	platoon := runner.New()
 	generator := Random(size)
 
 	taste()
