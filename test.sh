@@ -5,11 +5,15 @@ INPUT=/tmp/input
 OUTPUT=/tmp/output
 
 go build
-./tc1
+
+START=$(date +%s)
+./tc1 $*
+STOP=$(date +%s)
 
 input  () { sort $INPUT  | uniq ; }
 output () { sort $OUTPUT; }
 
+echo "time     $((STOP-START)) seconds"
 echo "Sent     $(wc -l <$INPUT) numbers"
 echo "Sent     $(input |  wc -l) unique numbers"
 echo "Received $(output | wc -l) unique numbers"
